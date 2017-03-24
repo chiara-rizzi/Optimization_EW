@@ -16,8 +16,7 @@ from Job import *
 def LaunchJobs(arguments, test_file=""):
     
     Njobs = 0    
-        
-    #Setting caracteristics for the JobSet object
+            #Setting caracteristics for the JobSet object
     JOSet = JobSet(platform)
     JOSet.setScriptDir(scriptFolder)
     JOSet.setLogDir(outputDir)

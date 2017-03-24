@@ -56,21 +56,16 @@ def make_sel_list_from_cuts(all_cuts, sel_to_add=""):
   biglist = list()
   for key in all_cuts_dict:
     biglist.append(all_cuts_dict[key])
-  mylist =  list(itertools.product(*biglist ))
-  
-  mylist2 = list()
-  # look at the lists of strings
+
+   # look at the lists of strings
   for cut in all_cuts:
     if type(cut) is list:
-      for c in cut:
-        for ml in mylist:
-          appo = list()
-          for m in ml:
-            appo.append(m)
-          appo.append(c)
-          mylist2.append(appo)
+      biglist.append(cut)
+ 
   # put all together
-  for sel_set in mylist2:
+  mylist =  list(itertools.product(*biglist ))
+
+  for sel_set in mylist:
     sel = ""
     for single_sel in sel_set:
       sel += single_sel

@@ -34,17 +34,22 @@ for arg in args:
 def make_sel_list(bin_sel=""):
   all_cuts = list()
 
-  #all_cuts.append(("mTb_min",">",[-1,80,100,120,140,160])) #5 (added 1)
-  #all_cuts.append(("pt_jet_4",">",[30,50,70,90])) #4
-  #all_cuts.append(("MJSum_rc_r08pt10",">",[-1,100,150,200,250])) #5 (added 1)
-  #all_cuts.append(("mT",">=",[-1,125,150,175,200,225])) #5
-  #all_cuts.append(("bjets_n",">=",[3,4])) #2
-  #all_cuts.append(("met/meff_incl",">=",[-1, 0.15, 0.2, 0.25])) #4 (new)
-  #all_cuts.append(("met",">",[200,250,300,350,400])) # 5 new
-  all_cuts.append(("met",">",[200,300])) # 5 new
-  all_cuts.append(("mTb_min",">",[200,300])) # 5 new
-  all_cuts.append(["pt_jet_4>30","pt_jet_4>40"])
-  
+
+  #all_cuts.append(("met",">",[150,180,200,300,400,500,600])) # 7 new
+  #all_cuts.append(("mTb_min",">",[-1, 80, 100, 120, 140, 160])) # 6 new
+  #all_cuts.append(["pt_jet_4>20","pt_jet_4>30"])
+  #all_cuts.append(("met_sig",">",[-1, 10, 15, 20])) # 7 new
+  #all_cuts.append(["bjets_n_85>=3","bjets_n_85>=4","bjets_n_85==3",  "bjets_n_77>=3","bjets_n_77>=4","bjets_n_77==3","bjets_n_70>=3","bjets_n_70>=4","bjets_n_70==3","bjets_n_60>=3","bjets_n_60>=4","bjets_n_60==3"])
+  #all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 7 new
+  #all_cuts.append(["dphi_min>0.4","dphi_min>0.75","dphi_min>1","dphi_min>1.25","dphi_min>1.5","dphi_min>0.4 && dphi_min<1","dphi_min>0.4 && dphi_min<0.75","dphi_min>0.4 && dphi_min<1.25"])
+  #all_cuts.append(["max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1000", "max(DeltaR_h1_115,DeltaR_h2_115)<1","max(DeltaR_h1_115,DeltaR_h2_115)<1.5","max(DeltaR_h1_115,DeltaR_h2_115)<2","max(DeltaR_h1_115,DeltaR_h2_115)<2.5","max(DeltaR_h1_115,DeltaR_h2_115)<1000", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1","max(DeltaR_h1_dR,DeltaR_h2_dR)<1.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<2","max(DeltaR_h1_dR,DeltaR_h2_dR)<2.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<1000"])
+  #all_cuts.append(["fabs(mass_h1_dR-mass_h2_dR)<20","fabs(mass_h1_dR-mass_h2_dR)<40","fabs(mass_h1_dR-mass_h2_dR)<60","fabs(mass_h1_dR-mass_h2_dR)<1000",
+  #                 "fabs(mass_h1_115-mass_h2_115)<20","fabs(mass_h1_115-mass_h2_115)<40","fabs(mass_h1_115-mass_h2_115)<60","fabs(mass_h1_115-mass_h2_115)<1000",
+  #                 "fabs(mass_h1_min_diff-mass_h2_min_diff)<20","fabs(mass_h1_min_diff-mass_h2_min_diff)<40","fabs(mass_h1_min_diff-mass_h2_min_diff)<60","fabs(mass_h1_min_diff-mass_h2_min_diff)<1000"])
+  #all_cuts.append(["((mass_h1_dR+mass_h2_dR)/2.)<140 && ((mass_h1_dR+mass_h2_dR)/2.)>100", "((mass_h1_dR+mass_h2_dR)/2.)<150 && ((mass_h1_dR+mass_h2_dR)/2.)>90", "((mass_h1_dR+mass_h2_dR)/2.)<130 && ((mass_h1_dR+mass_h2_dR)/2.)>100"])
+  all_cuts.append(["bjets_n_85>=4","bjets_n_77>=4"])
+  all_cuts.append(["met>200","met>300"])
+  all_cuts.append(("jets_n","<=",[5, 6]))
 
   sel_list = make_sel_list_from_cuts(all_cuts,bin_sel)
   print "Number of combinations", len(sel_list)
@@ -157,7 +162,7 @@ if __name__ == "__main__":
 
     #bin_sel = bins_def[list_bins[index_bin]]
     #bin_sel = merge_sel(bin_sel,met_sel)
-  outputdictionary="dict_24_03_17_test.pickle"
+  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle/dict_24_03_17_test.pickle"
   
   sel_extra=""
   i = -1
