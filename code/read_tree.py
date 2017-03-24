@@ -14,7 +14,8 @@ def add_weight(sel):
   # IFAE top framework
   #return "weight_mc*weight_lumi*weight_lep*weight_jvt*("+sel+")"
   # official inputs
-  return "weight_mc*weight_lumi*weight_btag*weight_elec*weight_muon*weight_jvt*weight_WZ_2_2*("+sel+")"
+  #return "weight_mc*weight_lumi*weight_btag*weight_elec*weight_muon*weight_jvt*weight_WZ_2_2*("+sel+")"
+  return "weight_mc*weight_lumi*weight_WZ_2_2*("+sel+")"
 
 
 def add_trigger(sel):
@@ -43,17 +44,33 @@ def make_sel_list_from_cuts(all_cuts, sel_to_add=""):
   sel_list=[]
   sel =""
   all_cuts_dict = dict()
+  # look at the tuple and build string
   for cut in all_cuts:
-    all_cuts_dict[cut[0]]= list()    
+    if type(cut) is tuple:
+      all_cuts_dict[cut[0]]= list()    
   for cut in all_cuts:
-    for step in cut[2]:
-      step_sel = cut[0]+cut[1]+str(step)
-      all_cuts_dict[cut[0]].append(step_sel)
+    if type(cut) is tuple:
+      for step in cut[2]:
+        step_sel = cut[0]+cut[1]+str(step)
+        all_cuts_dict[cut[0]].append(step_sel)
   biglist = list()
   for key in all_cuts_dict:
     biglist.append(all_cuts_dict[key])
   mylist =  list(itertools.product(*biglist ))
-  for sel_set in mylist:
+  
+  mylist2 = list()
+  # look at the lists of strings
+  for cut in all_cuts:
+    if type(cut) is list:
+      for c in cut:
+        for ml in mylist:
+          appo = list()
+          for m in ml:
+            appo.append(m)
+          appo.append(c)
+          mylist2.append(appo)
+  # put all together
+  for sel_set in mylist2:
     sel = ""
     for single_sel in sel_set:
       sel += single_sel

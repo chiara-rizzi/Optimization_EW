@@ -100,6 +100,8 @@ class JobSet:
         f.write("export OUTDIR='"+job.outDir+"' \n")
         f.write("\n")
         f.write(job.execName + " ")
+        for iArg in range(len(job.jobArguments)):
+            f.write(" \""+job.jobArguments[iArg]+"\"")
         for iOption in range(len(job.jobOptions)):
             f.write("--"+job.jobOptions[iOption][0]+"="+job.jobOptions[iOption][1]+" ")
         f.write(">& "+job.jobName+".log \n")
@@ -200,6 +202,7 @@ class Job:
             self.platform = "pic"
         self.debug = False
         self.jobOptions=[]
+        self.jobArguments=[]
         self.jobName=""
         self.execName=""
         self.outDir=""
@@ -211,6 +214,10 @@ class Job:
     ##
     def addOption(self,option,value):
         self.jobOptions += [[option,value]]
+    ##_________________________________________________________________________
+    ##
+    def addArgument(self,value):
+        self.jobArguments += [value]
     ##_________________________________________________________________________
     ##
     def setName(self,name):

@@ -1,0 +1,8 @@
+python/Scripts*
+*.pyc
+*#*
+*.pickle
+*~
+*.txt
+*.log
+*.tgz

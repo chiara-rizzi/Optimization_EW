@@ -13,7 +13,7 @@ from Job import *
 
 ##________________________________________________________
 ##
-def LaunchJobs( BtaggingOP, JetPtCut, Channel ):
+def LaunchJobs(arguments, test_file=""):
     
     Njobs = 0    
         
@@ -22,23 +22,23 @@ def LaunchJobs( BtaggingOP, JetPtCut, Channel ):
     JOSet.setScriptDir(scriptFolder)
     JOSet.setLogDir(outputDir)
     # chiara
-    f = open('myfile.txt', 'w')
-    JOSet.setSubmissionCommandsFile(f)        
+    if len(test_file) > 0:
+        f = open(test_file, 'w')
+        JOSet.setSubmissionCommandsFile(f)        
     JOSet.setTarBall(tarballPath)#tarball sent to batch (contains all executables)
     JOSet.setQueue("at3_short")
     jO = Job(platform)
         
     ## Name of the executable you want to run
     # chiara: look here!!
-    jO.setExecutable("python Optimization_new.py")
+    jO.setExecutable("python Ottimizzazione_new.py")
     jO.setDebug(debug)
         
-    name="Job_test_chiara"            
+    name="Job_test_chiara_"+str(TotalJobs)
     jO.setName(name)            
-    OFileName = "out_chiara.root"
-    jO.addOption("outputFile",OFileName) #name of the output file
+    for arg in arguments:
+        jO.addArgument(arg)
     jO.setOutDir(outputDir)                    
-    chkFile.write(outputDir+"/"+OFileName+"\n")        
     JOSet.addJob(jO)
 
     JOSet.writeScript()
@@ -61,10 +61,10 @@ here = os.getcwd()
 ##........................................................
 ##________________________________________________________
 ## Defining the paths and the tarball
-outputDir="/nfs/at3/scratch2/crizzi/susy_EW/optimization/Optimization_"+now+"/"
+outputDir="/nfs/at3/scratch2/crizzi/susy_EW/optimization_EW/Optimization_"+now+"/"
 scriptFolder=here+"/Scripts_Analysis_" + now
-tarballPath="/nfs/at3/scratch2/crizzi/susy_EW/optimization/Optimization_tar.tgz"
-prthForTarball="/nfs/at3/scratch2/crizzi/susy_EW/optimization/code/"
+tarballPath="/nfs/at3/scratch2/crizzi/susy_EW/optimization_EW/Optimization_tar.tgz"
+prthForTarball="/nfs/at3/scratch2/crizzi/susy_EW/optimization_EW/code/"
 ##........................................................
 ##________________________________________________________
 ## Creating usefull repositories
@@ -89,7 +89,7 @@ for BTagOP in ["85",]:
     for JetPt in ["30","40"]:
         for Channel in ["1LEPTON",]:
             print "hello"
-            TotalJobs += LaunchJobs(BTagOP, JetPt, Channel)
+            TotalJobs += LaunchJobs(["met > -1"])
 print "=> Total Njobs = ", TotalJobs
 ##........................................................
 chkFile.close()

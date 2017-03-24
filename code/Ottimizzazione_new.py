@@ -15,49 +15,45 @@ import read_tree
 from read_tree import *
 
 
-lumi = 36074.56 # forseen for Moriond 2017
+lumi = 36074.56 
 reluncer = 0.3
 
 name_infile = "/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/bkg_tagEW.2.4.28-1_v3_nominal_aliases_skim_3b_EW.root"
 name_infile_signal = "/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/Sig_GGM_17_03_22_tagEW.2.4.28-1_nominal_aliases_skim_3b_EW.root"
 
 # definition of the nj-meff bins
-pickle_sel_no_wei="/nfs/pic.es/user/c/crizzi/scratch2/susy_multib/compressed_regions/optimization_code/selections/sel_dict_01_08.pickle"
+#pickle_sel_no_wei="/nfs/pic.es/user/c/crizzi/scratch2/susy_multib/compressed_regions/optimization_code/selections/sel_dict_01_08.pickle"
 
 args=sys.argv
 
 print args
-index_bin = int(args[1])
-index_met = int(args[2])
 print len(args)
-if len(args) > 3:
-  index_meff = int(args[3])
-else:
-  index_meff = 999
-#index_mtbmin = int(args[3])
+for arg in args:
+  print arg
 
 def make_sel_list(bin_sel=""):
   all_cuts = list()
-  #  all_cuts.append(("",">",[]))
-  #  all_cuts.append(("mTb_min",">",[-1,80,100,120,140])) #5 (added 1)
-  #  all_cuts.append(("pt_jet_4",">",[30,50,70,90,110])) #5
-  #  all_cuts.append(("MJSum_rc_r08pt10",">",[-1,100,150,200,250,300])) #6 (added 1)
-  #  all_cuts.append(("mT",">=",[-1,125,150,175,200,225,250])) #5
-  #  all_cuts.append(("bjets_n",">=",[3,4])) #2
-  #  all_cuts.append(("met/meff_incl",">=",[-1, 0.3, 0.35, 0.4, 0.45, 0.5])) #6 (new)
 
-  # Jan 8th 2017
-  all_cuts.append(("mTb_min",">",[-1,80,100,120,140,160])) #5 (added 1)
-  all_cuts.append(("pt_jet_4",">",[30,50,70,90])) #4
-  all_cuts.append(("MJSum_rc_r08pt10",">",[-1,100,150,200,250])) #5 (added 1)
-  all_cuts.append(("mT",">=",[-1,125,150,175,200,225])) #5
-  all_cuts.append(("bjets_n",">=",[3,4])) #2
-  all_cuts.append(("met/meff_incl",">=",[-1, 0.15, 0.2, 0.25])) #4 (new)
-  all_cuts.append(("met",">",[200,250,300,350,400])) # 5 new
+  #all_cuts.append(("mTb_min",">",[-1,80,100,120,140,160])) #5 (added 1)
+  #all_cuts.append(("pt_jet_4",">",[30,50,70,90])) #4
+  #all_cuts.append(("MJSum_rc_r08pt10",">",[-1,100,150,200,250])) #5 (added 1)
+  #all_cuts.append(("mT",">=",[-1,125,150,175,200,225])) #5
+  #all_cuts.append(("bjets_n",">=",[3,4])) #2
+  #all_cuts.append(("met/meff_incl",">=",[-1, 0.15, 0.2, 0.25])) #4 (new)
+  #all_cuts.append(("met",">",[200,250,300,350,400])) # 5 new
+  all_cuts.append(("met",">",[200,300])) # 5 new
+  all_cuts.append(("mTb_min",">",[200,300])) # 5 new
+  all_cuts.append(["pt_jet_4>30","pt_jet_4>40"])
+  
 
-  sel_list=make_sel_list_from_cuts(all_cuts,bin_sel)
+  sel_list = make_sel_list_from_cuts(all_cuts,bin_sel)
   print "Number of combinations", len(sel_list)
   return sel_list
+
+def check_sel(outputdictionary,backgrounds,masses,bin_sel=""):
+    for sel in make_sel_list(bin_sel):
+      print "\n--------------------------" 
+      print "Considering selection\n" ,sel
 
 
 def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
@@ -84,7 +80,8 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
   
   for sel in make_sel_list(bin_sel):                  
     #print "\n\n--------------------------"
-    #print "Considering selection\n\n" ,sel
+    print "\n--------------------------" 
+    print "Considering selection\n\n" ,sel
     
     # look ar singnal
     nsignal = dict()
@@ -114,7 +111,7 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
         continue
       bkg_tuple = integral_and_error(t, sel)
       totbkg += (bkg_tuple[0]*lumi)
-      #print b, bkg_tuple[0]*lumi
+      print b, bkg_tuple[0]*lumi
       if "ttbar" in b:
         #print "this is ttbar!"
         nttbar += (bkg_tuple[0]*lumi)
@@ -127,10 +124,9 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
       significance[m] = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),reluncer)
       #print m,significance[m]
     
-    #print "nttbar", nttbar
-    #print "Significance ",significance
+    print "nttbar", nttbar
+    print "Significance ",significance
     sel_sig_map [sel] = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
-    #sel_sig_map [sel] = (nttbar)
           
     #print "At selection #", i
           
@@ -156,49 +152,27 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
 
 if __name__ == "__main__":
 
-  print "index_bin",index_bin
-  print "index_met",index_met
-  print "index_meff",index_meff
+  masses = ["GGM_hh_130","GGM_hh_150","GGM_hh_200","GGM_hh_300","GGM_hh_400","GGM_hh_500","GGM_hh_600","GGM_hh_800"]
+  backgrounds=["Wjets","Zjets","SingleTop","TopEW","ttbar"]
 
-  #masses = ["Gbb_1900_1","Gbb_1900_600","Gbb_1900_1200","Gbb_1900_1400","Gbb_1900_1600","Gbb_1900_1800","Gbb_1700_600","Gbb_2100_400","Gtt_1900_1","Gtt_1900_600","Gtt_1900_1200","Gtt_1900_1400","Gtt_1900_1545","Gtt_1700_600","Gtt_2100_400","Gtt_2100_1","Gbb_2100_1"]
-  # remove Gbb 2100 400 not present in input file
-  masses = ["Gbb_1900_1","Gbb_1900_600","Gbb_1900_1200","Gbb_1900_1400","Gbb_1900_1600","Gbb_1900_1800","Gbb_1700_600","Gtt_1900_1","Gtt_1900_600","Gtt_1900_1200","Gtt_1900_1400","Gtt_1900_1545","Gtt_1700_600","Gtt_2100_400","Gtt_2100_1","Gbb_2100_1"]
-  backgrounds=["diboson","Wjets","Zjets","SingleTop","TopEW","ttbar"]
-
-  with open(pickle_sel_no_wei, 'rb') as handle:
-    bins_def_appo = pickle.load(handle)
-
-  bins_def=dict()
-  for key in bins_def_appo:
-    if "meff" in key:
-      bins_def[key]=bins_def_appo[key]
-
-  list_bins=[]
-  for key in bins_def:
-    list_bins.append(key)
-    list_bins=sorted(list_bins, reverse=True)
-    #print key
-
-  meff_var="meff_4j"
-  if "meff_incl" in list_bins[index_bin]:
-    meff_var="meff_incl"
-
-  print "meff var",meff_var
-  print list_bins[index_bin]
+    #bin_sel = bins_def[list_bins[index_bin]]
+    #bin_sel = merge_sel(bin_sel,met_sel)
+  outputdictionary="dict_24_03_17_test.pickle"
   
-  # old check that I've removed
-  stop=False
+  sel_extra=""
+  i = -1
+  for arg in args:
+    i+=1
+    if i == 0:
+      continue
+    if i == 1:
+      sel_extra = arg
+    if i > 1:
+      sel_extra = merge_sel(sel_extra,arg)
 
-  if not stop:
-    met_cut=("razor_PP_mDeltaR",">",[-1,100,200,300,400,500,600,700,800,900,1000]) # 11
-    step = met_cut[2][index_met]
-    met_sel = met_cut[0]+met_cut[1]+str(step)
-    
-    bin_sel = bins_def[list_bins[index_bin]]
-    bin_sel = merge_sel(bin_sel,met_sel)
-    
-    print bin_sel
-
-    outputdictionary="dict_17_01_08_"+list_bins[index_bin]+"_mDR_"+str(step)+".pickle"
-
-    run_optimization(outputdictionary, backgrounds, masses, bin_sel)
+  add_to_name=sel_extra.replace(" ","").replace("&&","").replace("=","").replace(">","_").replace("<","").replace(")(","_").replace(")","").replace("(","").replace("-","m")
+  print add_to_name
+  outputdictionary=outputdictionary.replace(".pickle","_"+add_to_name+".pickle")
+  print outputdictionary
+  check_sel(outputdictionary, backgrounds, masses, sel_extra)
+  #run_optimization(outputdictionary, backgrounds, masses, sel_extra)
