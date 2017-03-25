@@ -25,7 +25,7 @@ def LaunchJobs(arguments, test_file=""):
         f = open(test_file, 'w')
         JOSet.setSubmissionCommandsFile(f)        
     JOSet.setTarBall(tarballPath)#tarball sent to batch (contains all executables)
-    JOSet.setQueue("at3_short")
+    JOSet.setQueue("at3_8h")
     jO = Job(platform)
         
     ## Name of the executable you want to run
@@ -84,11 +84,14 @@ chkFile = open(scriptFolder+"/JobCheck.chk","write")
 TotalJobs = 0
 
 prepareTarBall(prthForTarball, tarballPath)
-for BTagOP in ["85",]:
-    for JetPt in ["30","40"]:
-        for Channel in ["1LEPTON",]:
-            print "hello"
-            TotalJobs += LaunchJobs(["met > -1"])
+list_b = ["bjets_n_85>=3","bjets_n_85==3","bjets_n_85>=4", "bjets_n_77>=3","bjets_n_77==3","bjets_n_77>=4","bjets_n_70>=3","bjets_n_70==3","bjets_n_70>=4","bjets_n_60>=3","bjets_n_60==3","bjets_n_60>=4"]
+list_dR=["max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1000", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1","max(DeltaR_h1_dR,DeltaR_h2_dR)<1.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<2","max(DeltaR_h1_dR,DeltaR_h2_dR)<2.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<1000"]
+list_m =["fabs(mass_h1_dR-mass_h2_dR)<40","fabs(mass_h1_dR-mass_h2_dR)<60","fabs(mass_h1_dR-mass_h2_dR)<1000", "fabs(mass_h1_min_diff-mass_h2_min_diff)<40","fabs(mass_h1_min_diff-mass_h2_min_diff)<60","fabs(mass_h1_min_diff-mass_h2_min_diff)<1000"]
+for b in list_b:
+    for dR in list_dR:
+        for m in list_m:
+            print b, dR, m
+            TotalJobs += LaunchJobs([b, dR, m])
 print "=> Total Njobs = ", TotalJobs
 ##........................................................
 chkFile.close()

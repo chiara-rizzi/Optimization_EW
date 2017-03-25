@@ -6,3 +6,5 @@ python/Scripts*
 *.txt
 *.log
 *.tgz
+*.out
+Optimization_2017*

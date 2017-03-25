@@ -33,33 +33,32 @@ for arg in args:
 
 def make_sel_list(bin_sel=""):
   all_cuts = list()
+  all_cuts.append(["dphi_min>0.4","dphi_min>0.7","dphi_min>1.0","dphi_min>1.3"]) # 4
+  all_cuts.append(["pt_jet_4>20","pt_jet_4>30"]) # 2
 
+  all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 4
+  all_cuts.append(("met_sig",">",[-1, 10, 15])) # 3
 
-  #all_cuts.append(("met",">",[150,180,200,300,400,500,600])) # 7 new
-  #all_cuts.append(("mTb_min",">",[-1, 80, 100, 120, 140, 160])) # 6 new
-  #all_cuts.append(["pt_jet_4>20","pt_jet_4>30"])
-  #all_cuts.append(("met_sig",">",[-1, 10, 15, 20])) # 7 new
-  #all_cuts.append(["bjets_n_85>=3","bjets_n_85>=4","bjets_n_85==3",  "bjets_n_77>=3","bjets_n_77>=4","bjets_n_77==3","bjets_n_70>=3","bjets_n_70>=4","bjets_n_70==3","bjets_n_60>=3","bjets_n_60>=4","bjets_n_60==3"])
-  #all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 7 new
-  #all_cuts.append(["dphi_min>0.4","dphi_min>0.75","dphi_min>1","dphi_min>1.25","dphi_min>1.5","dphi_min>0.4 && dphi_min<1","dphi_min>0.4 && dphi_min<0.75","dphi_min>0.4 && dphi_min<1.25"])
-  #all_cuts.append(["max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1000", "max(DeltaR_h1_115,DeltaR_h2_115)<1","max(DeltaR_h1_115,DeltaR_h2_115)<1.5","max(DeltaR_h1_115,DeltaR_h2_115)<2","max(DeltaR_h1_115,DeltaR_h2_115)<2.5","max(DeltaR_h1_115,DeltaR_h2_115)<1000", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1","max(DeltaR_h1_dR,DeltaR_h2_dR)<1.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<2","max(DeltaR_h1_dR,DeltaR_h2_dR)<2.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<1000"])
-  #all_cuts.append(["fabs(mass_h1_dR-mass_h2_dR)<20","fabs(mass_h1_dR-mass_h2_dR)<40","fabs(mass_h1_dR-mass_h2_dR)<60","fabs(mass_h1_dR-mass_h2_dR)<1000",
-  #                 "fabs(mass_h1_115-mass_h2_115)<20","fabs(mass_h1_115-mass_h2_115)<40","fabs(mass_h1_115-mass_h2_115)<60","fabs(mass_h1_115-mass_h2_115)<1000",
-  #                 "fabs(mass_h1_min_diff-mass_h2_min_diff)<20","fabs(mass_h1_min_diff-mass_h2_min_diff)<40","fabs(mass_h1_min_diff-mass_h2_min_diff)<60","fabs(mass_h1_min_diff-mass_h2_min_diff)<1000"])
-  #all_cuts.append(["((mass_h1_dR+mass_h2_dR)/2.)<140 && ((mass_h1_dR+mass_h2_dR)/2.)>100", "((mass_h1_dR+mass_h2_dR)/2.)<150 && ((mass_h1_dR+mass_h2_dR)/2.)>90", "((mass_h1_dR+mass_h2_dR)/2.)<130 && ((mass_h1_dR+mass_h2_dR)/2.)>100"])
-  all_cuts.append(["bjets_n_85>=4","bjets_n_77>=4"])
-  all_cuts.append(["met>200","met>300"])
-  all_cuts.append(("jets_n","<=",[5, 6]))
+  all_cuts.append(("mTb_min",">",[-1, 80, 100, 120, 140, 160])) # 6 new
+  all_cuts.append(("met",">",[150,180,200,300,400,500])) # 6 new
+
+  all_cuts.append(["((mass_h1_dR+mass_h2_dR)/2.)<140 && ((mass_h1_dR+mass_h2_dR)/2.)>100", "((mass_h1_dR+mass_h2_dR)/2.)<150 && ((mass_h1_dR+mass_h2_dR)/2.)>90", "((mass_h1_dR+mass_h2_dR)/2.)<130 && ((mass_h1_dR+mass_h2_dR)/2.)>100",  "((mass_h1_min_diff+mass_h2_min_diff)/2.)<140 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>100", "((mass_h1_min_diff+mass_h2_min_diff)/2.)<150 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>90", "((mass_h1_min_diff+mass_h2_min_diff)/2.)<130 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>100"]) #6
+
+  #all_cuts.append(["bjets_n_85>=4"])
+  #all_cuts.append(["jets_n<=5"])
 
   sel_list = make_sel_list_from_cuts(all_cuts,bin_sel)
   print "Number of combinations", len(sel_list)
   return sel_list
 
 def check_sel(outputdictionary,backgrounds,masses,bin_sel=""):
-    for sel in make_sel_list(bin_sel):
-      print "\n--------------------------" 
-      print "Considering selection\n" ,sel
+  for sel in make_sel_list(bin_sel):
+    print "\n--------------------------" 
+    print "Considering selection\n" ,sel
 
+def check_number(outputdictionary,backgrounds,masses,bin_sel=""):
+  make_sel_list(bin_sel)
+  
 
 def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
 
@@ -84,9 +83,8 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
   m_time.Start()
   
   for sel in make_sel_list(bin_sel):                  
-    #print "\n\n--------------------------"
-    print "\n--------------------------" 
-    print "Considering selection\n\n" ,sel
+    #print "\n--------------------------" 
+    #print "Considering selection\n\n" ,sel
     
     # look ar singnal
     nsignal = dict()
@@ -116,7 +114,7 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
         continue
       bkg_tuple = integral_and_error(t, sel)
       totbkg += (bkg_tuple[0]*lumi)
-      print b, bkg_tuple[0]*lumi
+      #print b, bkg_tuple[0]*lumi
       if "ttbar" in b:
         #print "this is ttbar!"
         nttbar += (bkg_tuple[0]*lumi)
@@ -129,8 +127,8 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
       significance[m] = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),reluncer)
       #print m,significance[m]
     
-    print "nttbar", nttbar
-    print "Significance ",significance
+    #print "nttbar", nttbar
+    #print "Significance ",significance
     sel_sig_map [sel] = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
           
     #print "At selection #", i
@@ -175,9 +173,9 @@ if __name__ == "__main__":
     if i > 1:
       sel_extra = merge_sel(sel_extra,arg)
 
-  add_to_name=sel_extra.replace(" ","").replace("&&","").replace("=","").replace(">","_").replace("<","").replace(")(","_").replace(")","").replace("(","").replace("-","m")
+  add_to_name=sel_extra.replace("==","_ug_").replace(" ","").replace("&&","").replace("=","").replace(">","_").replace("<","").replace(")(","_").replace(")","").replace("(","").replace("-","m")
   print add_to_name
   outputdictionary=outputdictionary.replace(".pickle","_"+add_to_name+".pickle")
   print outputdictionary
-  check_sel(outputdictionary, backgrounds, masses, sel_extra)
-  #run_optimization(outputdictionary, backgrounds, masses, sel_extra)
+  #check_number(outputdictionary, backgrounds, masses, sel_extra)
+  run_optimization(outputdictionary, backgrounds, masses, sel_extra)

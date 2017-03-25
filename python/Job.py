@@ -73,6 +73,7 @@ class JobSet:
         f.write("#!/bin/bash \n")
         f.write("export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase \n")
         f.write("source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh \n")
+        f.write("lsetup root \n")
         f.write("cd $TMPDIR \n")
         f.write("\n")
         f.write("echo '==> Before copying tarball'\n")
