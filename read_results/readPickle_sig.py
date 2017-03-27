@@ -6,6 +6,16 @@ from array import array
 #import make_table
 
 
+selections = {"btag60":"bjets_n_60", "btag70":"bjets_n_70", "btag77":"bjets_n_77", "btag85":"bjets_n_85", "5j":"jets_n<=5", "6j":"jets_n<=6", "7j":"jets_n<=7", "anyj":"jets_n<=100",
+              "ptj20":"pt_jet_4>20", "ptj30":"pt_jet_4>30", "min_diff":"!_dR", "dR":"!_min_diff"}
+mysel = ["dR"]
+
+name_out="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/read_results/"+"dict"
+for s in mysel:
+   name_out+="_"
+   name_out+=s
+name_out+=".pickle"
+
 def passes_criteria(elem, signal, sel, string):
    # elem = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
    # * at least 2 signal events (weighted)
@@ -16,11 +26,18 @@ def passes_criteria(elem, signal, sel, string):
    # * ttbar rel stat unc < 0.3
    if not elem[3] > 0:
       return False
-
-   # ttbar stat unc
    if elem[4]/elem[3] > 0.3:
       return False
-
+   for s in mysel:
+      if not s in selections:
+         print s,"not in selections"
+         return False
+      if selections[s].startswith("!"):
+         if selections[s].replace("!","") in sel:
+            return False
+      else:
+         if not selections[s] in sel:
+            return False
    # ttbar > 60%
    #if elem[3]/elem[2] < 0.6:
    #   return False
@@ -100,16 +117,18 @@ def readbigpickle(sel_sig_map, signal, string):
       if sig_map[key] < 1.79769313486e+308:
          if isel > 0:
             break
-         #print "\n\nBEST SELS:"
+         print "\n\n"
+         print signal
+         print "BEST SELS:"
          print key
          print "significance for",signal,":",sig_map[key]
          print "signal events:", sel_sig_map[key][1][signal]
          print "total background:",sel_sig_map[key][2]
-         #print "ttbar:",sel_sig_map[key][3],"pm",sel_sig_map[key][4],"  (rel err:",sel_sig_map[key][4]/sel_sig_map[key][3],")"
-         #print sel_sig_map[key],"\n"
+         print "ttbar:",sel_sig_map[key][3],"pm",sel_sig_map[key][4],"  (rel err:",sel_sig_map[key][4]/sel_sig_map[key][3],")"
+         print sel_sig_map[key],"\n"
          isel += 1
    #return (key,key+" && z-ttbar=="+"{:.2f}".format(sel_sig_map[key][3])+" && z-backg=="+"{:.2f}".format(sel_sig_map[key][2])+" && zz-signal=="+"{:.2f}".format(sel_sig_map[key][1][signal])+" && zz-signif=="+"{:.2f}".format(sig_map[key]) +" && z-ttbar-unc=="+"{:.2f}".format(sel_sig_map[key][4]/sel_sig_map[key][3])+" && z-ttbar-frac=="+"{:.2f}".format(sel_sig_map[key][3]/sel_sig_map[key][2])   )
-   return (key,key+" && z-ttbar=="+"{:.2f}".format(sel_sig_map[key][3])+" && z-backg=="+"{:.2f}".format(sel_sig_map[key][2])+" && z-signal=="+"{:.2f}".format(sel_sig_map[key][1][signal])+" && z-ttbar-unc=="+"{:.2f}".format(sel_sig_map[key][4]/sel_sig_map[key][3])+" && z-ttbar-frac=="+"{:.2f}".format(sel_sig_map[key][3]/sel_sig_map[key][2])   )
+         return (key,key+" && z-ttbar=="+"{:.2f}".format(sel_sig_map[key][3])+" && z-backg=="+"{:.2f}".format(sel_sig_map[key][2])+" && z-signal=="+"{:.2f}".format(sel_sig_map[key][1][signal])+" && z-ttbar-unc=="+"{:.2f}".format(sel_sig_map[key][4]/sel_sig_map[key][3])+" && z-ttbar-frac=="+"{:.2f}".format(sel_sig_map[key][3]/sel_sig_map[key][2])   )
    
    #print "\n\nFINE!!!\n\n"
 
@@ -119,9 +138,11 @@ def printbigpickle(sel_sig_map, signal):
    sig_map = dict()
    for key in sel_sig_map:
       print key
+      if key not in sel_sig_map:
+         print "not in sel_sig_map!!"
+         continue
       #if passes_criteria(sel_sig_map[key], signal):
-      sig_map[key]=sel_sig_map[key][0][signal]
-   
+      sig_map[key]=sel_sig_map[key][0][signal]   
    isel =0
    for key in sorted(sig_map,key=sig_map.__getitem__, reverse=True):
       if isel>0:
@@ -145,15 +166,20 @@ if __name__ == '__main__':
 
    signals = ["130","150","200","300","400","500","600","800"]
 
-
    #sel_dict=dict()
    final_selections=dict()
    final_selections_table=dict()
 
-   sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle', "dict", "test1.pickle","",["GGM_hh_"+s for s in signals])
+   sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle', "dict", "outpu_not_used.pickle","",["GGM_hh_"+s for s in signals])
+   #sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_test', "dict", "test1.pickle","",["GGM_hh_"+s for s in signals])
    for s in signals:
       final_selections[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[0]
-      final_selections_table[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[1]
+      #final_selections_table[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[1]
+
+   pickle.dump(final_selections, open(name_out, "wb" ) )
+
+   #for s in signals:
+      #printbigpickle(sel_dict_string, s)
 
    """      
       if final_selections[string]:
@@ -161,7 +187,6 @@ if __name__ == '__main__':
       print ""
 
    print "\n\n\n"
-
 
    for key in sorted(final_selections):
       #print key
@@ -184,5 +209,5 @@ if __name__ == '__main__':
    f.write(closure)
    f.close()
    """
-   pickle.dump(final_selections, open( "test_chiara.pickle", "wb" ) )
+
 
