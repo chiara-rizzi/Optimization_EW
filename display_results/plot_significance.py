@@ -6,8 +6,7 @@ import math
 #from pdgRounding import pdgRound
 from ROOT import RooStats
 import itertools
-
-import pickle
+import json
 
 import read_tree
 from read_tree import *
@@ -38,18 +37,20 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--reg', default='0', type=str, help='If this string is not in the reigon name, skip the region')
-    parser.add_argument('--pickle', default='test_chiara.pickle', type=str, help='Name of the pickle file with the region definition')
+    parser.add_argument('--json', default='test_chiara.json', type=str, help='Name of the pickle file with the region definition')
     parser.add_argument('--pdf', default='significances.pdf', type=str, help='Name of the output pdf file')
     args = parser.parse_args()
 
-    pickle_file=args.pickle
+    json_file=args.json
     out_name=args.pdf
 
     sel_table=dict()    
 
-    with open(pickle_file, 'rb') as handle:   
-        x = pickle.load(handle)
-        
+    with open(json_file, 'rb') as handle:   
+        x = json.load(handle)
+
+    
+
     h = ROOT.TH1F("h","h",len(masses),0,len(masses))
     h.GetXaxis().SetTitle("m(#tilde{#chi})   [GeV]")
     h.GetYaxis().SetTitle("Significance")
