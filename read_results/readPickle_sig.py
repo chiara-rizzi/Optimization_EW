@@ -3,6 +3,7 @@ import glob, os
 import re
 import ROOT
 from array import array
+import json
 #import make_table
 
 
@@ -26,7 +27,7 @@ name_out="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/read_result
 #   name_out+=s
 #name_out+=".pickle"
 
-name_out+="_btag77_hhmass_v0.pickle"
+name_out+="_btag77_hhmass_v0.json"
 
 def passes_criteria(elem, signal, sel, string, mysel):
    # elem = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
@@ -210,7 +211,13 @@ if __name__ == '__main__':
       #final_selections["ZZ_"+s]=readbigpickle(sel_dict_string, "Zh_"+s+"_ZZ4b", "")[0]
       #final_selections_table[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[1]
 
-   pickle.dump(final_selections, open(name_out, "wb" ) )
+
+
+   print final_selections
+   with open(name_out,"w") as outf:
+      json.dump(final_selections, outf, indent=2)
+   outf.close()
+   #pickle.dump(final_selections, open(name_out, "wb" ) )
 
    #for s in signals:
       #printbigpickle(sel_dict_string, s)
