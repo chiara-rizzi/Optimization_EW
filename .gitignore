@@ -7,4 +7,5 @@ python/Scripts*
 *.log
 *.tgz
 *.out
+*.pdf
 Optimization_2017*

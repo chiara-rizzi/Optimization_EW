@@ -19,7 +19,7 @@ lumi = 36074.56
 reluncer = 0.3
 
 name_infile = "/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/bkg_tagEW.2.4.28-1_v3_nominal_aliases_skim_3b_EW.root"
-name_infile_signal = "/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/Sig_GGM_17_03_22_tagEW.2.4.28-1_nominal_aliases_skim_3b_EW.root"
+name_infile_signal = "/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/mini_trees_hh_v4_4btypes_aliases.root"
 
 # definition of the nj-meff bins
 #pickle_sel_no_wei="/nfs/pic.es/user/c/crizzi/scratch2/susy_multib/compressed_regions/optimization_code/selections/sel_dict_01_08.pickle"
@@ -33,20 +33,20 @@ for arg in args:
 
 def make_sel_list(bin_sel=""):
   all_cuts = list()
-  all_cuts.append(["dphi_min>0.4","dphi_min>0.7","dphi_min>1.0","dphi_min>1.3"]) # 4
-  all_cuts.append(["pt_jet_4>20","pt_jet_4>30"]) # 2
-
-  all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 4
-  all_cuts.append(("met_sig",">",[-1, 10, 15])) # 3
-
+  all_cuts.append(["signal_leptons_n==0 && pass_MET && jets_n>=4"])
+  all_cuts.append(["dphi_min>0.4","dphi_min>0.5","dphi_min>0.6","dphi_min>0.7","dphi_min>1.0","dphi_min>1.3"]) # 6
+  #all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 4
+  #all_cuts.append(["pt_jet_4>20","pt_jet_4>30"]) # 2
+  all_cuts.append(("met_sig",">",[-1, 2.5, 5, 10, 15])) # 5
   all_cuts.append(("mTb_min",">",[-1, 80, 100, 120, 140, 160])) # 6 new
-  all_cuts.append(("met",">",[150,180,200,300,400,500])) # 6 new
+  #all_cuts.append(("met",">",[150,180,200,300,400,500])) # 6 new
+  all_cuts.append(("max(DeltaR_h1_dR,DeltaR_h2_dR)","<",[1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 1000])) #9
 
-  all_cuts.append(["((mass_h1_dR+mass_h2_dR)/2.)<140 && ((mass_h1_dR+mass_h2_dR)/2.)>100", "((mass_h1_dR+mass_h2_dR)/2.)<150 && ((mass_h1_dR+mass_h2_dR)/2.)>90", "((mass_h1_dR+mass_h2_dR)/2.)<130 && ((mass_h1_dR+mass_h2_dR)/2.)>100",  "((mass_h1_min_diff+mass_h2_min_diff)/2.)<140 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>100", "((mass_h1_min_diff+mass_h2_min_diff)/2.)<150 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>90", "((mass_h1_min_diff+mass_h2_min_diff)/2.)<130 && ((mass_h1_min_diff+mass_h2_min_diff)/2.)>100"]) #6
-
-  #all_cuts.append(["bjets_n_85>=4"])
-  #all_cuts.append(["jets_n<=5"])
-
+                  
+  
+                  #all_cuts.append(["bjets_n_85>=4"])
+                  #all_cuts.append(["jets_n<=5"])
+  
   sel_list = make_sel_list_from_cuts(all_cuts,bin_sel)
   print "Number of combinations", len(sel_list)
   return sel_list
@@ -155,12 +155,17 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
 
 if __name__ == "__main__":
 
-  masses = ["GGM_hh_130","GGM_hh_150","GGM_hh_200","GGM_hh_300","GGM_hh_400","GGM_hh_500","GGM_hh_600","GGM_hh_800"]
+#masses = ["GGM_hh_130","GGM_hh_150","GGM_hh_200","GGM_hh_300","GGM_hh_400","GGM_hh_500","GGM_hh_600","GGM_hh_800"]
+  masses=["hh_130_hh4b","hh_150_hh4b","hh_200_hh4b","hh_300_hh4b","hh_400_hh4b","hh_500_hh4b","hh_600_hh4b","hh_800_hh4b",
+          "Zh_130_Zh4b","Zh_150_Zh4b","Zh_200_Zh4b","Zh_300_Zh4b","Zh_400_Zh4b","Zh_500_Zh4b","Zh_600_Zh4b","Zh_800_Zh4b",
+          "Zh_130_ZZ4b","Zh_150_ZZ4b","Zh_200_ZZ4b","Zh_300_ZZ4b","Zh_400_ZZ4b","Zh_500_ZZ4b","Zh_600_ZZ4b","Zh_800_ZZ4b"
+          ]
+                  
   backgrounds=["Wjets","Zjets","SingleTop","TopEW","ttbar"]
 
     #bin_sel = bins_def[list_bins[index_bin]]
     #bin_sel = merge_sel(bin_sel,met_sel)
-  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle/dict_24_03_17_test.pickle"
+  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03/dict_17_04_03_test.pickle"
   
   sel_extra=""
   i = -1

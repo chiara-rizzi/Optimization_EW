@@ -25,7 +25,7 @@ def LaunchJobs(arguments, test_file=""):
         f = open(test_file, 'w')
         JOSet.setSubmissionCommandsFile(f)        
     JOSet.setTarBall(tarballPath)#tarball sent to batch (contains all executables)
-    JOSet.setQueue("at3_8h")
+    JOSet.setQueue("at3_short")
     jO = Job(platform)
         
     ## Name of the executable you want to run
@@ -84,14 +84,18 @@ chkFile = open(scriptFolder+"/JobCheck.chk","write")
 TotalJobs = 0
 
 prepareTarBall(prthForTarball, tarballPath)
-list_b = ["bjets_n_85>=3","bjets_n_85==3","bjets_n_85>=4", "bjets_n_77>=3","bjets_n_77==3","bjets_n_77>=4","bjets_n_70>=3","bjets_n_70==3","bjets_n_70>=4","bjets_n_60>=3","bjets_n_60==3","bjets_n_60>=4"]
-list_dR=["max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<2.5","max(DeltaR_h1_min_diff,DeltaR_h2_min_diff)<1000", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1","max(DeltaR_h1_dR,DeltaR_h2_dR)<1.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<2","max(DeltaR_h1_dR,DeltaR_h2_dR)<2.5","max(DeltaR_h1_dR,DeltaR_h2_dR)<1000"]
-list_m =["fabs(mass_h1_dR-mass_h2_dR)<40","fabs(mass_h1_dR-mass_h2_dR)<60","fabs(mass_h1_dR-mass_h2_dR)<1000", "fabs(mass_h1_min_diff-mass_h2_min_diff)<40","fabs(mass_h1_min_diff-mass_h2_min_diff)<60","fabs(mass_h1_min_diff-mass_h2_min_diff)<1000"]
+#list_b = ["bjets_n_85>=3","bjets_n_85==3","bjets_n_85>=4", "bjets_n_77>=3","bjets_n_77==3","bjets_n_77>=4","bjets_n_70>=3","bjets_n_70==3","bjets_n_70>=4","bjets_n_60>=3","bjets_n_60==3","bjets_n_60>=4"]
+list_b = ["bjets_n_77>=3","bjets_n_77==3","bjets_n_77>=4","bjets_n_70>=3","bjets_n_70==3","bjets_n_70>=4"] #6
+list_met = ["met>180 && met<250","met>250 && met<400","met>400","met>450","met>180","met>250","met>300","met>350","met>180 && met<225","met>225 && met<350"] #10
+list_m =["mass_h1_dR>70 && mass_h1_dR<100 && mass_h2_dR>70 && mass_h2_dR<100", "mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>70 && mass_h2_dR<100", "mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>100 && mass_h2_dR<140"] #3
+list_j=["jets_n<=5","jets_n<=6","jets_n<=7","jets_n>=4"]
+
 for b in list_b:
-    for dR in list_dR:
+    for dR in list_met:
         for m in list_m:
-            print b, dR, m
-            TotalJobs += LaunchJobs([b, dR, m])
+            for j in list_j:
+                print b, dR, m, j
+                TotalJobs += LaunchJobs([b, dR, m, j])
 print "=> Total Njobs = ", TotalJobs
 ##........................................................
 chkFile.close()

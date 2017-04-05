@@ -7,16 +7,28 @@ from array import array
 
 
 selections = {"btag60":"bjets_n_60", "btag70":"bjets_n_70", "btag77":"bjets_n_77", "btag85":"bjets_n_85", "5j":"jets_n<=5", "6j":"jets_n<=6", "7j":"jets_n<=7", "anyj":"jets_n<=100",
-              "ptj20":"pt_jet_4>20", "ptj30":"pt_jet_4>30", "min_diff":"!_dR", "dR":"!_min_diff"}
-mysel = ["dR"]
+              "ptj20":"pt_jet_4>20", "ptj30":"pt_jet_4>30", "min_diff":"!_dR", "dR":"!_min_diff", "met_from_180":"!met>150", "met_from_200":"!met>180",
+              "ex3b_btag60":"bjets_n_60==3", "ex3b_btag70":"bjets_n_70==3", "ex3b_btag77":"bjets_n_77==3", "ex3b_btag85":"bjets_n_85==3",
+              "4b_btag60":"bjets_n_60>=4", "4b_btag70":"bjets_n_70>=4", "4b_btag77":"bjets_n_77>=4", "4b_btag85":"bjets_n_85>=4",
+              "met_bins":"met<",
+              "met_180_250":"met>180 && met<250",
+              "met_250_400":"met>250 && met<400",
+              "met_400":"met>400",
+              "Zh_mass":"mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>70 && mass_h2_dR<100",
+              "hh_mass":"mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>100 && mass_h2_dR<140",
+              }
+#mysel = ["dR","ptj20","met_from_180","ex3b_btag85"]
+mysel = ["btag77"]
 
 name_out="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/read_results/"+"dict"
-for s in mysel:
-   name_out+="_"
-   name_out+=s
-name_out+=".pickle"
+#for s in mysel:
+#   name_out+="_"
+#   name_out+=s
+#name_out+=".pickle"
 
-def passes_criteria(elem, signal, sel, string):
+name_out+="_btag77_hhmass_v0.pickle"
+
+def passes_criteria(elem, signal, sel, string, mysel):
    # elem = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
    # * at least 2 signal events (weighted)
    # at least 2 signal events
@@ -44,7 +56,7 @@ def passes_criteria(elem, signal, sel, string):
    
    return True
 
-def readpickle(inputdir, string, out_name, signal, list_signals):
+def readpickle(inputdir, string, out_name, signal, list_signals, mysel):
    sel_sig_map=dict()
    print "Intput dir ", inputdir
    os.chdir(inputdir)
@@ -58,9 +70,10 @@ def readpickle(inputdir, string, out_name, signal, list_signals):
       xx = dict()
       for mysig in list_signals:
          #print mysig
+         #print mysig
          sig_map=dict()
          for key in x.keys():
-            if not passes_criteria(x[key], mysig, key, string):
+            if not passes_criteria(x[key], mysig, key, string, mysel):
                continue
             sig_map[key]=x[key][0][mysig]         
          isel =0
@@ -83,7 +96,7 @@ def readpickle(inputdir, string, out_name, signal, list_signals):
             print "key"
             print key
             print x[key]
-         if passes_criteria(x[key], signal, key, string):
+         if passes_criteria(x[key], signal, key, string, mysel):
             sel_sig_map[key_new]=x[key]
       i+=1
       #print i,mypickle
@@ -96,6 +109,7 @@ def readpickle(inputdir, string, out_name, signal, list_signals):
 def readbigpickle(sel_sig_map, signal, string):
    #print "\n\nREADING BIG BIG PICKLE!!!\n"
    sig_map = dict()
+   #print sel_sig_map
    for key in sel_sig_map:
       if type(sel_sig_map[key]) == str:
          continue
@@ -105,6 +119,8 @@ def readbigpickle(sel_sig_map, signal, string):
       #print signal
       #print 'sel_sig_map[key]'
       #print sel_sig_map[key]
+      #print "sel_sig_map[key][0]"
+      #print sel_sig_map[key][0]
    #   if passes_criteria(sel_sig_map[key], signal, key):
       #print key
       sig_map[key]=sel_sig_map[key][0][signal]
@@ -166,14 +182,32 @@ if __name__ == '__main__':
 
    signals = ["130","150","200","300","400","500","600","800"]
 
+   signal_list=["hh_"+s+"_hh4b" for s in signals]
+   signal_list+=["Zh_"+s+"_Zh4b" for s in signals]
+   signal_list+=["Zh_"+s+"_ZZ4b" for s in signals]
+
+   print "my signal list!"
+   print signal_list
+
    #sel_dict=dict()
    final_selections=dict()
    final_selections_table=dict()
 
-   sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle', "dict", "outpu_not_used.pickle","",["GGM_hh_"+s for s in signals])
-   #sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_test', "dict", "test1.pickle","",["GGM_hh_"+s for s in signals])
-   for s in signals:
-      final_selections[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[0]
+   str_sel_pickle_300="bjets_n_77*met_180met250*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+   str_sel_pickle_500="bjets_n_77*met_250met400*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+   str_sel_pickle_800="bjets_n_77*met_400_mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+   sel_dict_string_300 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_300, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_800, "outpu_not_used.pickle","",signal_list, mysel)
+   final_selections["hh_300"]=readbigpickle(sel_dict_string_300, "hh_300_hh4b", "")[0]
+   final_selections["hh_500"]=readbigpickle(sel_dict_string_500, "hh_500_hh4b", "")[0]
+   final_selections["hh_800"]=readbigpickle(sel_dict_string_800, "hh_800_hh4b", "")[0]
+
+   #sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_test', "dict", "test1.pickle","",["GGM_hh_"+s for s in signals])   
+   #print sel_dict_string
+   #for s in signals:
+      #final_selections["Zh_"+s]=readbigpickle(sel_dict_string, "Zh_"+s+"_Zh4b", "")[0]
+      #final_selections["ZZ_"+s]=readbigpickle(sel_dict_string, "Zh_"+s+"_ZZ4b", "")[0]
       #final_selections_table[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[1]
 
    pickle.dump(final_selections, open(name_out, "wb" ) )
