@@ -2,6 +2,7 @@ python/Scripts*
 *.pyc
 *#*
 *.pickle
+*.json
 *~
 *.txt
 *.log
@@ -9,3 +10,4 @@ python/Scripts*
 *.out
 *.pdf
 Optimization_2017*
+output_*/

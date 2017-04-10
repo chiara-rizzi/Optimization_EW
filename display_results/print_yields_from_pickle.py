@@ -30,6 +30,7 @@ sig_file = ROOT.TFile.Open(sig_name,"READ")
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--quadraticSum', default=0, type=int, help='')
     parser.add_argument('--reg', default='0', type=str, help='')
     parser.add_argument('--meffRw', default=False, type=bool, help='')
     parser.add_argument('--doTable', default=False, type=bool, help='')
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     do_add_weight_meff=args.meffRw
     do_table=args.doTable
     do_print_all_bkg=args.printAllBkg
+    do_sum = args.quadraticSum
 
     sel_table=dict()    
 

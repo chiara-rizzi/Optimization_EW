@@ -16,6 +16,7 @@ reluncer = 0.3
 
 folder="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/"
 sig_name=folder+"Sig_GGM_17_03_22_tagEW.2.4.28-1_nominal_aliases_skim_3b_EW.root"
+#sig_name=folder+"mini_trees_hh_v4_4btypes_aliases.root"
 bkg_name=folder+"bkg_tagEW.2.4.28-1_v3_nominal_aliases_skim_3b_EW.root"
 backgrounds=["Wjets","Zjets","SingleTop","TopEW","ttbar"]
 masses = ["130","150","200","300","400","500","600","800"]
@@ -26,7 +27,12 @@ sig_file = ROOT.TFile.Open(sig_name,"READ")
 def which_mass(name):
     for m in masses:
         if m in name:
-            return m
+            if "hh" in name:
+                return "hh-"+m
+            else:
+                return "Zh-"+m
+    if "sum" in name:
+        return "quad sum"
     return "none"
 
 if __name__ == "__main__":
@@ -36,13 +42,15 @@ if __name__ == "__main__":
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--quadraticSum', default=1, type=int, help='If the regions are orthogonal, draw quadratic sum')
     parser.add_argument('--reg', default='0', type=str, help='If this string is not in the reigon name, skip the region')
-    parser.add_argument('--json', default='test_chiara.json', type=str, help='Name of the pickle file with the region definition')
-    parser.add_argument('--pdf', default='significances.pdf', type=str, help='Name of the output pdf file')
+    parser.add_argument('--json', default='../read_results/dict_btag77_hhmass.json', type=str, help='Name of the pickle file with the region definition')
+    parser.add_argument('--pdf', default='significances_hhmass_pt20.pdf', type=str, help='Name of the output pdf file')
     args = parser.parse_args()
 
     json_file=args.json
     out_name=args.pdf
+    do_sum = args.quadraticSum
 
     sel_table=dict()    
 
@@ -74,6 +82,7 @@ if __name__ == "__main__":
         print "------------------------------"
         print key
         sel = x[key]
+        #sel = "("+sel+")*is_hh_4b"
         hs.append(ROOT.TH1F("h_sig_"+key,"h",len(masses),0,len(masses)))
         print sel
         # look at signal
@@ -102,6 +111,7 @@ if __name__ == "__main__":
         ibin = 1
         for m in masses:
             t_signal = sig_file.Get("GGM_hh_"+m+"_NoSys")
+            #t_signal = sig_file.Get("hh_"+m+"_hh4b_NoSys")
             if (not t_signal):
                 print "GGM_hh_"+m+"_NoSys"+" not found"
                 nsignal[m]=0.
@@ -110,6 +120,7 @@ if __name__ == "__main__":
                 #sel_sig = sel_sig.replace("*weight_meff_low_mTb","")
             signal_tuple = integral_and_error(t_signal, sel_sig)
             nsignal[m]=signal_tuple[0]*lumi
+            #nsignal[m]=nsignal[m]*2.0 # for Zh
             #if nsignal[m]/totbkg > 0.2:
                 #print m,nsignal[m], "S/B:",nsignal[m]/totbkg #,"sig:", RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
             signif = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
@@ -122,6 +133,21 @@ if __name__ == "__main__":
     leg.SetFillStyle(0)
     leg.SetLineColor(0)
     ih =0
+
+    for myh in hs:
+        for ibin in range(0,myh.GetNbinsX()+1):
+            if  myh.GetBinContent(ibin) < 0:
+                myh.SetBinContent(ibin, 0)    
+    if do_sum:
+        h_sum=hs[0].Clone("quadrature_sum")
+        for ibin in range(0,h_sum.GetNbinsX()+1):
+            bin_cont =0
+            for myh in hs:
+                bin_cont_appo = myh.GetBinContent(ibin)
+                bin_cont += (bin_cont_appo*bin_cont_appo)
+            h_sum.SetBinContent(ibin, math.sqrt(bin_cont))
+        hs.append(h_sum)
+
     for myh in hs:
         #print "legend for",sorted(x.keys())[ih]
         leg.AddEntry(myh, which_mass(myh.GetName()), "l")
