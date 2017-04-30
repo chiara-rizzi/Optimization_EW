@@ -17,32 +17,41 @@ selections = {"btag60":"bjets_n_60", "btag70":"bjets_n_70", "btag77":"bjets_n_77
               "met_400":"met>400",
               "Zh_mass":"mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>70 && mass_h2_dR<100",
               "hh_mass":"mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>100 && mass_h2_dR<140",
+              "any":">"
               }
 #mysel = ["dR","ptj20","met_from_180","ex3b_btag85"]
-mysel = ["btag77"]
+mysel = ["any"]
 
 name_out="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/read_results/"+"dict"
-#for s in mysel:
-#   name_out+="_"
-#   name_out+=s
-#name_out+=".pickle"
 
-name_out+="_btag77_hhmass_v2.json"
+name_out+="_test_binned_MaxUncBkg50.json"
 
 def passes_criteria(elem, signal, sel, string, mysel):
-   # elem = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw)
+   # elem = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw, error_bkg)
    # * at least 2 signal events (weighted)
    # at least 2 signal events
    #if elem[1][signal] < 2:
       #return False
+   # there must be some background
+   if not elem[2]>0:
+      return False
+   
+   if elem[6]/elem[2] > 0.5:
+      return False
+
+   # ttbar > 60%
+   #if elem[3]/elem[2] < 0.3:
+   #   return False
 
    # * ttbar rel stat unc < 0.3
-   if not elem[3] > 0:
+   #if not elem[3] > 0:
       #print "no ttbar"
-      return False
-   if elem[4]/elem[3] > 0.3:
+   #   return False
+
+   #if elem[4]/elem[3] > 0.7:
       #print "big uncertianty"
-      return False
+   #   return False
+   """
    for s in mysel:
       if not s in selections:
          #print s,"not in selections"
@@ -55,10 +64,7 @@ def passes_criteria(elem, signal, sel, string, mysel):
          if not selections[s] in sel:
             #print "no sel"
             return False
-   # ttbar > 60%
-   if elem[3]/elem[2] < 0.4:
-      return False
-   
+            """   
    return True
 
 def readpickle(inputdir, string, out_name, signal, list_signals, mysel):
@@ -189,57 +195,138 @@ def printbigpickle(sel_sig_map, signal):
 
 if __name__ == '__main__':
 
-   signals = ["130","150","200","300","400","500","600","800"]
-
-   signal_list=["hh_"+s+"_hh4b" for s in signals]
-   signal_list+=["Zh_"+s+"_Zh4b" for s in signals]
-   #signal_list+=["Zh_"+s+"_ZZ4b" for s in signals]
-
-   print "my signal list!"
-   print signal_list
 
    #sel_dict=dict()
    final_selections=dict()
    final_selections_table=dict()
 
-   str_sel_pickle_hh300="bjets_n_77*met_180met250*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
-   str_sel_pickle_hh500="bjets_n_77*met_250met400*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
-   str_sel_pickle_hh800="bjets_n_77*met_400_mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
 
-   str_sel_pickle_Zh300="bjets_n_77*met_180met250*mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
-   str_sel_pickle_Zh500="bjets_n_77*met_250met400*mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
-   str_sel_pickle_Zh800="bjets_n_77*met_400_mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
+   signals = ["130","150","200","300","400","500","600","800"]
 
-   sel_dict_string_hh300 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh300, "outpu_not_used.pickle","",signal_list, mysel)
-   sel_dict_string_hh500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh500, "outpu_not_used.pickle","",signal_list, mysel)
-   sel_dict_string_hh800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh800, "outpu_not_used.pickle","",signal_list, mysel)
+   signal_list=["hh_"+s+"_hh4b" for s in signals]
+   signal_list+=["Zh_"+s+"_Zh4b" for s in signals]
 
-   sel_dict_string_Zh300 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh300, "outpu_not_used.pickle","",signal_list, mysel)
-   sel_dict_string_Zh500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh500, "outpu_not_used.pickle","",signal_list, mysel)
-   sel_dict_string_Zh800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh800, "outpu_not_used.pickle","",signal_list, mysel)
+   signals = ["200","300","500","800"]
+   signal_list=["GGM_Zh_"+s+"_ZZqqbb" for s in signals]
+   signal_list+=["GGM_Zh_"+s+"_Zhqqbb" for s in signals]
+   signal_list+=["GGM_Zh_"+s+"_ZZllbb" for s in signals]
+   signal_list+=["GGM_Zh_"+s+"_Zhllbb" for s in signals]
+   signal_list+=["GGM_Zh_"+s+"_Zh4b" for s in signals]
+   signal_list+=["GGM_Zh_"+s+"_ZZ4b" for s in signals]
+   signal_list+=["GGM_hh_"+s+"_hh4b" for s in signals]
 
-   final_selections["hh_300"]=readbigpickle(sel_dict_string_hh300, "hh_300_hh4b", "")[0]
-   final_selections["hh_500"]=readbigpickle(sel_dict_string_hh500, "hh_500_hh4b", "")[0]
-   final_selections["hh_800"]=readbigpickle(sel_dict_string_hh800, "hh_800_hh4b", "")[0]
 
-   final_selections["Zh_300"]=readbigpickle(sel_dict_string_Zh300, "Zh_300_Zh4b", "")[0]
-   final_selections["Zh_500"]=readbigpickle(sel_dict_string_Zh500, "Zh_500_Zh4b", "")[0]
-   final_selections["Zh_800"]=readbigpickle(sel_dict_string_Zh800, "Zh_800_Zh4b", "")[0]
+   print "my signal list!"
+   print signal_list
 
-   #sel_dict_string = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_test', "dict", "test1.pickle","",["GGM_hh_"+s for s in signals])   
-   #print sel_dict_string
-   #for s in signals:
-      #final_selections["Zh_"+s]=readbigpickle(sel_dict_string, "Zh_"+s+"_Zh4b", "")[0]
-      #final_selections["ZZ_"+s]=readbigpickle(sel_dict_string, "Zh_"+s+"_ZZ4b", "")[0]
-      #final_selections_table[s]=readbigpickle(sel_dict_string, "GGM_hh_"+s, "")[1]
 
+   ##################
+   # 4b final state #
+   ##################
+
+
+   str_sel_pickle_hh4b_300="bjets_n_77*met_180met250*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+   str_sel_pickle_hh4b_500="bjets_n_77*met_250met400*mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+   str_sel_pickle_hh4b_800="bjets_n_77*met_400_mass_h1_dR_100mass_h1_dR140mass_h2_dR_100mass_h2_dR140"
+
+   str_sel_pickle_Zh4b_300="bjets_n_77*met_180met250*mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
+   str_sel_pickle_Zh4b_500="bjets_n_77*met_250met400*mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
+   str_sel_pickle_Zh4b_800="bjets_n_77*met_400_mass_h1_dR_100mass_h1_dR140mass_h2_dR_70mass_h2_dR100"
+
+   sel_dict_string_hh4b_300 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh4b_300, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_hh4b_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh4b_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_hh4b_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_hh4b_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   sel_dict_string_Zh4b_300 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh4b_300, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zh4b_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh4b_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zh4b_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_03', str_sel_pickle_Zh4b_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   final_selections["hh4b_300"]=readbigpickle(sel_dict_string_hh4b_300, "hh_300_hh4b", "")[0]
+   final_selections["hh4b_500"]=readbigpickle(sel_dict_string_hh4b_500, "hh_500_hh4b", "")[0]
+   final_selections["hh4b_800"]=readbigpickle(sel_dict_string_hh4b_800, "hh_800_hh4b", "")[0]
+
+   final_selections["Zh4b_300"]=readbigpickle(sel_dict_string_Zh4b_300, "Zh_300_Zh4b", "")[0]
+   final_selections["Zh4b_500"]=readbigpickle(sel_dict_string_Zh4b_500, "Zh_500_Zh4b", "")[0]
+   final_selections["Zh4b_800"]=readbigpickle(sel_dict_string_Zh4b_800, "Zh_800_Zh4b", "")[0]
+
+
+   ####################
+   # qqbb final state #
+   ####################
+   
+   str_sel_pickle_ZZqqbb_200="*_met_180met250_mass_bb_70mass_bb100mass_jj_70mass_jj100*"
+   str_sel_pickle_ZZqqbb_500="*_met_250met400_mass_bb_70mass_bb100mass_jj_70mass_jj100*"
+   str_sel_pickle_ZZqqbb_800="*_met_400_mass_bb_70mass_bb100mass_jj_70mass_jj100*"
+
+   str_sel_pickle_Zhqqbb_200="*_met_180met250_mass_bb_100mass_bb140mass_jj_70mass_jj100*"
+   str_sel_pickle_Zhqqbb_500="*_met_250met400_mass_bb_100mass_bb140mass_jj_70mass_jj100*"
+   str_sel_pickle_Zhqqbb_800="*_met_400_mass_bb_100mass_bb140mass_jj_70mass_jj100*"
+
+   sel_dict_string_ZZqqbb_200 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZqqbb_200, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_ZZqqbb_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZqqbb_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_ZZqqbb_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZqqbb_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   sel_dict_string_Zhqqbb_200 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhqqbb_200, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zhqqbb_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhqqbb_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zhqqbb_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhqqbb_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   final_selections["ZZqqbb_200"]=readbigpickle(sel_dict_string_ZZqqbb_200, "GGM_Zh_200_ZZqqbb", "")[0]
+   final_selections["ZZqqbb_500"]=readbigpickle(sel_dict_string_ZZqqbb_500, "GGM_Zh_500_ZZqqbb", "")[0]
+   final_selections["ZZqqbb_800"]=readbigpickle(sel_dict_string_ZZqqbb_800, "GGM_Zh_800_ZZqqbb", "")[0]
+
+   final_selections["Zhqqbb_200"]=readbigpickle(sel_dict_string_Zhqqbb_200, "GGM_Zh_200_Zhqqbb", "")[0]
+   final_selections["Zhqqbb_500"]=readbigpickle(sel_dict_string_Zhqqbb_500, "GGM_Zh_500_Zhqqbb", "")[0]
+   final_selections["Zhqqbb_800"]=readbigpickle(sel_dict_string_Zhqqbb_800, "GGM_Zh_800_Zhqqbb", "")[0]
+
+   ####################
+   # llbb final state #
+   ####################
+
+   str_sel_pickle_ZZllbb_200="*_met_180met250_mass_bb_70mass_bb100Z_mass_70Z_mass100*"
+   str_sel_pickle_ZZllbb_500="*_met_250met400_mass_bb_70mass_bb100Z_mass_70Z_mass100*"
+   str_sel_pickle_ZZllbb_800="*_met_400_mass_bb_70mass_bb100Z_mass_70Z_mass100*"
+
+   str_sel_pickle_Zhllbb_200="*_met_180met250_mass_bb_100mass_bb140Z_mass_70Z_mass100*"
+   str_sel_pickle_Zhllbb_500="*_met_250met400_mass_bb_100mass_bb140Z_mass_70Z_mass100*"
+   str_sel_pickle_Zhllbb_800="*_met_400_mass_bb_100mass_bb140Z_mass_70Z_mass100*"
+
+   sel_dict_string_ZZllbb_200 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZllbb_200, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_ZZllbb_500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZllbb_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_ZZllbb_800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_ZZllbb_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   sel_dict_string_Zhllbb200 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhllbb_200, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zhllbb500 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhllbb_500, "outpu_not_used.pickle","",signal_list, mysel)
+   sel_dict_string_Zhllbb800 = readpickle('/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29', str_sel_pickle_Zhllbb_800, "outpu_not_used.pickle","",signal_list, mysel)
+
+   final_selections["ZZllbb_200"]=readbigpickle(sel_dict_string_ZZllbb_200, "GGM_Zh_200_ZZllbb", "")[0]
+   final_selections["ZZllbb_500"]=readbigpickle(sel_dict_string_ZZllbb_500, "GGM_Zh_500_ZZllbb", "")[0]
+   final_selections["ZZllbb_800"]=readbigpickle(sel_dict_string_ZZllbb_800, "GGM_Zh_800_ZZllbb", "")[0]
+
+   final_selections["Zhllbb_200"]=readbigpickle(sel_dict_string_Zhllbb200, "GGM_Zh_200_Zhllbb", "")[0]
+   final_selections["Zhllbb_500"]=readbigpickle(sel_dict_string_Zhllbb500, "GGM_Zh_500_Zhllbb", "")[0]
+   final_selections["Zhllbb_800"]=readbigpickle(sel_dict_string_Zhllbb800, "GGM_Zh_800_Zhllbb", "")[0]
 
 
    print final_selections
    with open(name_out,"w") as outf:
       json.dump(final_selections, outf, indent=2)
    outf.close()
-   #pickle.dump(final_selections, open(name_out, "wb" ) )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    #for s in signals:
       #printbigpickle(sel_dict_string, s)
