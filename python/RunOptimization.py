@@ -25,7 +25,7 @@ def LaunchJobs(arguments, test_file=""):
         f = open(test_file, 'w')
         JOSet.setSubmissionCommandsFile(f)        
     JOSet.setTarBall(tarballPath)#tarball sent to batch (contains all executables)
-    JOSet.setQueue("at3")
+    JOSet.setQueue("at3_short")
     jO = Job(platform)
         
     ## Name of the executable you want to run
@@ -86,24 +86,34 @@ TotalJobs = 0
 prepareTarBall(prthForTarball, tarballPath)
 #list_b = ["bjets_n_85>=3","bjets_n_85==3","bjets_n_85>=4", "bjets_n_77>=3","bjets_n_77==3","bjets_n_77>=4","bjets_n_70>=3","bjets_n_70==3","bjets_n_70>=4","bjets_n_60>=3","bjets_n_60==3","bjets_n_60>=4"]
 #list_b = ["bjets_n>=3","bjets_n==3","bjets_n>=4"] #3
-#list_b = ["bjets_n==2 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"]
-#bjets_n==2 && signal_leptons_n>=2 && pass_MET && jets_n>=2 && Z_OSLeps met>350 mass_bb>100 && mass_bb<140 && Z_mass>70 && Z_mass<100 jets_n<=3 DeltaR_bb<2.0
 
-#list_b = ["bjets_n==2 && signal_leptons_n>=2 && pass_MET && jets_n>=2 && Z_OSLeps"]
-#list_j=["jets_n<=3","jets_n<=4","jets_n<=5"]
-#list_j=["jets_n<=6","jets_n<=7","jets_n>=2"] #6
-#list_m=["mass_bb>70 && mass_bb<100 && Z_mass>70 && Z_mass<100", "mass_bb>100 && mass_bb<140 && Z_mass>70 && Z_mass<100"]
+# for qqbb final state
+"""
+list_b = ["bjets_n==2 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"]#1
+list_j=["jets_n<=5", "jets_n<=6","jets_n<=7","jets_n>=4"] #4
+list_m=["mass_bb>70 && mass_bb<100 && mass_jj>70 && mass_jj<100", "mass_bb>100 && mass_bb<140 && mass_jj>70 && mass_jj<100"] #2
+list_dr = ["DeltaR_bb>-1", "DeltaR_bb<0.8", "DeltaR_bb<0.9", "DeltaR_bb<1.0", "DeltaR_bb<1.1", "DeltaR_bb<1.2", "DeltaR_bb<1.3", "DeltaR_bb<1.5", "DeltaR_bb<1.7", "DeltaR_bb<2.0", "DeltaR_bb<2.5"] # 11
+list_met = ["met>180 && met<250","met>250 && met<400","met>400","met>450","met>180","met>250","met>300","met>350","met>500"] #9
+"""
 
-#list_dr = ["DeltaR_bb>-1", "DeltaR_bb<0.8", "DeltaR_bb<0.9", "DeltaR_bb<1.0", "DeltaR_bb<1.1", "DeltaR_bb<1.2", "DeltaR_bb<1.3", "DeltaR_bb<1.5", "DeltaR_bb<1.7", "DeltaR_bb<2.0", "DeltaR_bb<2.5"] # 11
+# for 2L2b final state
+list_b = ["bjets_n==2 && signal_leptons_n>=2 && pass_MET && jets_n>=2 && Z_OSLeps"] #1
+list_j=["jets_n<=3","jets_n<=4","jets_n<=5","jets_n<=6","jets_n<=7","jets_n>=2"] #6
+list_m=["mass_bb>70 && mass_bb<100 && Z_mass>70 && Z_mass<100", "mass_bb>100 && mass_bb<140 && Z_mass>70 && Z_mass<100"]#2
+list_dr = ["DeltaR_bb>-1", "DeltaR_bb<0.8", "DeltaR_bb<0.9", "DeltaR_bb<1.0", "DeltaR_bb<1.1", "DeltaR_bb<1.2", "DeltaR_bb<1.3", "DeltaR_bb<1.5", "DeltaR_bb<1.7", "DeltaR_bb<2.0", "DeltaR_bb<2.5"] # 11
+#list_met = ["met>180 && met<250","met>250 && met<400","met>400","met>450","met>180","met>250","met>300","met>350","met>500"] #9
+list_met = ["met>350","met>500"] 
 
-#"max(DeltaR_h1_dR,DeltaR_h2_dR)","<",[1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 1000]
-
+# for 4b final state
+"""
 list_dr = ["max(DeltaR_h1_dR,DeltaR_h2_dR)>-1", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1.25", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1.5", "max(DeltaR_h1_dR,DeltaR_h2_dR)<1.75", "max(DeltaR_h1_dR,DeltaR_h2_dR)<2", "max(DeltaR_h1_dR,DeltaR_h2_dR)<2.5", "max(DeltaR_h1_dR,DeltaR_h2_dR)<3", "max(DeltaR_h1_dR,DeltaR_h2_dR)<3.5", "max(DeltaR_h1_dR,DeltaR_h2_dR)<0.8"] #10
-list_b=["bjets_n>=3 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4","bjets_n==3 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4","bjets_n>=4 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"] #3
+#list_b=["bjets_n>=3 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4","bjets_n==3 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4","bjets_n>=4 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"] #3
+list_b=["bjets_n>=3 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4","bjets_n>=4 && signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"] #2
 list_j=["jets_n<=5","jets_n<=6","jets_n<=7","jets_n>=4"] #4
 list_m =["mass_h1_dR>70 && mass_h1_dR<100 && mass_h2_dR>70 && mass_h2_dR<100", "mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>70 && mass_h2_dR<100", "mass_h1_dR>100 && mass_h1_dR<140 && mass_h2_dR>100 && mass_h2_dR<140"] #3
-#list_met = ["met>180 && met<250","met>250 && met<400","met>400","met>450","met>180","met>250","met>300","met>350","met>500"] #9
-list_met = ["met>350","met>500"]
+list_met = ["met>180 && met<250","met>250 && met<400","met>400","met>450","met>180","met>250","met>300","met>350","met>500"] #9
+"""
+
 
 #list_m=["mass_bb>70 && mass_bb<100 && mass_jj>70 && mass_jj<100", "mass_bb>100 && mass_bb<140 && mass_jj>70 && mass_jj<100"]
 # ZZ

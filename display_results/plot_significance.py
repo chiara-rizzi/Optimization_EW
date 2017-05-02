@@ -14,11 +14,10 @@ from read_tree import *
 lumi = 36074.56 # forseen for Moriond 2017
 reluncer = 0.3
 
-folder="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tagEW.2.4.28-1-0/"
-sig_name=folder+"Sig_GGM_17_03_22_tagEW.2.4.28-1_nominal_aliases_skim_3b_EW.root"
-#sig_name=folder+"mini_trees_hh_v4_4btypes_aliases.root"
-bkg_name=folder+"bkg_tagEW.2.4.28-1_v3_nominal_aliases_skim_3b_EW.root"
-backgrounds=["Wjets","Zjets","SingleTop","TopEW","ttbar"]
+folder="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tag.EW.2.4.28-3-3/"
+sig_name=folder+"Sig_GGM_tagEW.2.4.28-3-3_nominal_all_types.root"
+bkg_name=folder+"bkg_tagEW.2.4.28-3-3_nominal.root"
+backgrounds=["Wjets","Zjets","SingleTop","ttbar"]
 masses = ["130","150","200","300","400","500","600","800"]
 
 bkg_file = ROOT.TFile.Open(bkg_name,"READ")
@@ -29,6 +28,8 @@ def which_mass(name):
         if m in name:
             if "hh" in name:
                 return "hh-"+m
+            elif "ZZ" in name:
+                return "ZZ-"+m
             else:
                 return "Zh-"+m
     if "sum" in name:
@@ -41,16 +42,22 @@ if __name__ == "__main__":
     ROOT.gStyle.SetOptTitle(0)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
+    #--treeType 'hh' --sigType 'hh4b' --comb 1 --pdf 'significances_binned_ttbar50.pdf'
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--quadraticSum', default=1, type=int, help='If the regions are orthogonal, draw quadratic sum')
+    parser.add_argument('--comb', default=1, type=int, help='If the regions are orthogonal, draw quadratic sum')
     parser.add_argument('--reg', default='0', type=str, help='If this string is not in the reigon name, skip the region')
-    parser.add_argument('--json', default='../read_results/dict_btag77_hhmass.json', type=str, help='Name of the pickle file with the region definition')
-    parser.add_argument('--pdf', default='significances_hhmass_pt20.pdf', type=str, help='Name of the output pdf file')
+    parser.add_argument('--treeType', default='hh', type=str, help='read from hh or Zh sample? chosse hh or Zh')
+    parser.add_argument('--sigType', default='hh4b', type=str, help='Which signal to look at?')
+    parser.add_argument('--json', default='../read_results/dict_test_binned_ttbar50_MaxUnctt40.json', type=str, help='Name of the pickle file with the region definition')
+    parser.add_argument('--pdf', default='significances_hhmass.pdf', type=str, help='Name of the output pdf file')
     args = parser.parse_args()
 
     json_file=args.json
     out_name=args.pdf
-    do_sum = args.quadraticSum
+    do_sum = args.comb
+    tree_type=args.treeType
+    sig_type=args.sigType
 
     sel_table=dict()    
 
@@ -110,7 +117,8 @@ if __name__ == "__main__":
         print "total bkg:",totbkg
         ibin = 1
         for m in masses:
-            t_signal = sig_file.Get("GGM_hh_"+m+"_NoSys")
+            t_signal = sig_file.Get("GGM_"+tree_type+"_"+m+"_"+sig_type+"_NoSys")
+            print t_signal
             #t_signal = sig_file.Get("hh_"+m+"_hh4b_NoSys")
             if (not t_signal):
                 print "GGM_hh_"+m+"_NoSys"+" not found"
@@ -120,7 +128,12 @@ if __name__ == "__main__":
                 #sel_sig = sel_sig.replace("*weight_meff_low_mTb","")
             signal_tuple = integral_and_error(t_signal, sel_sig)
             nsignal[m]=signal_tuple[0]*lumi
-            #nsignal[m]=nsignal[m]*2.0 # for Zh
+            if "Zh" in sig_type:
+                print "Zh! x2"
+                nsignal[m]=nsignal[m]*2.0 # for Zh
+            elif "ZZ" in sig_type:
+                print "ZZ! x4"
+                nsignal[m]=nsignal[m]*4.0 # for Zh
             #if nsignal[m]/totbkg > 0.2:
                 #print m,nsignal[m], "S/B:",nsignal[m]/totbkg #,"sig:", RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
             signif = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
@@ -129,7 +142,7 @@ if __name__ == "__main__":
             ibin+=1
         isel+=1
 
-    leg=ROOT.TLegend(0.13,0.68,0.31,0.89)
+    leg=ROOT.TLegend(0.13,0.6,0.31,0.89)
     leg.SetFillStyle(0)
     leg.SetLineColor(0)
     ih =0
@@ -146,6 +159,7 @@ if __name__ == "__main__":
                 bin_cont_appo = myh.GetBinContent(ibin)
                 bin_cont += (bin_cont_appo*bin_cont_appo)
             h_sum.SetBinContent(ibin, math.sqrt(bin_cont))
+        h_sum.SetLineStyle(3)
         hs.append(h_sum)
 
     for myh in hs:
@@ -157,7 +171,8 @@ if __name__ == "__main__":
     c.cd()
     h.Draw()
     leg.Draw()
-    colors = [609, 856, 410, 801, 629, 879, 602, 921, 622]
+    colors = [609, 856, 410, 801, 629, 879, 602, 921, 622, 632 ]
+    #colors=[ 800, 797, 810, 630, 898, 808, 616, 611, 880, 875,873, 600, 603, 591, 856, 432, 434, 436, 416, 419, 410, 920, 922, 400, 400-6, 400-1, 844]
     ih=0
     for myh in hs:
         #print sorted(x.keys())[ih], colors[ih]

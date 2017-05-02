@@ -114,7 +114,8 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
         print b,"not found"
         continue
       bkg_tuple = integral_and_error(t, sel)
-      totbkg += (bkg_tuple[0]*lumi)
+      if bkg_tuple[0] > 0:
+        totbkg += (bkg_tuple[0]*lumi)
       error_bkg += ((bkg_tuple[1]*lumi)*(bkg_tuple[1]*lumi))
       #print b, bkg_tuple[0]*lumi
       if "ttbar" in b:
@@ -170,11 +171,11 @@ if __name__ == "__main__":
             "GGM_Zh_200_Zhllbb","GGM_Zh_300_Zhllbb","GGM_Zh_500_Zhllbb","GGM_Zh_800_Zhllbb"]
 
                   
-  backgrounds=["Wjets","Zjets","SingleTop","ttbar","diboson"]
+  backgrounds=["Wjets","Zjets","SingleTop","ttbar","diboson","TopEW"]
 
     #bin_sel = bins_def[list_bins[index_bin]]
     #bin_sel = merge_sel(bin_sel,met_sel)
-  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_04_29/dict_17_04_29.pickle"
+  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_05_01/dict_17_05_01.pickle"
   
   sel_extra=""
   i = -1
