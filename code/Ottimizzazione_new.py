@@ -33,6 +33,7 @@ for arg in args:
 
 def make_sel_list(bin_sel=""):
   all_cuts = list()
+  all_cuts.append(["signal_leptons_n==0 && dphi_min>0.4 && pass_MET && jets_n>=4"])
   all_cuts.append(["dphi_min>-1","dphi_min>0.5","dphi_min>0.6","dphi_min>0.7","dphi_min>1.0","dphi_min>1.5"]) # 6
   #all_cuts.append(("jets_n","<=",[5, 6, 7, 100])) # 4
   #all_cuts.append(["pt_jet_4>20","pt_jet_4>30"]) # 2
@@ -104,26 +105,26 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
     # look at background
     totbkg = 0
     error_bkg = 0
-    nttbar = 0
-    error_ttbar = 0
-    nttbar_raw = 0
+    nindividual = dict()
+    error_individual = dict()
+    nindividual_raw = dict()
     for b in backgrounds:
-      b = b+"_NoSys"
-      t = infile.Get(b)
+      nindividual[b] = 0
+      error_individual[b] = 0
+      nindividual_raw[b] = 0
+      b_tree = b+"_NoSys"
+      t = infile.Get(b_tree)
       if (not t):
         print b,"not found"
         continue
       bkg_tuple = integral_and_error(t, sel)
-      if bkg_tuple[0] > 0:
+      if bkg_tuple[0] > 0: # add only if >0
         totbkg += (bkg_tuple[0]*lumi)
-      error_bkg += ((bkg_tuple[1]*lumi)*(bkg_tuple[1]*lumi))
-      #print b, bkg_tuple[0]*lumi
-      if "ttbar" in b:
-        #print "this is ttbar!"
-        nttbar += (bkg_tuple[0]*lumi)
-        error_ttbar += (bkg_tuple[1]*lumi)*(bkg_tuple[1]*lumi)
-        nttbar_raw += bkg_tuple[2]
-    error_ttbar = math.sqrt(error_ttbar)
+        nindividual[b] = (bkg_tuple[0]*lumi)
+        error_individual[b] = bkg_tuple[1]*lumi
+        nindividual_raw[b] = bkg_tuple[2] 
+        error_bkg += ((bkg_tuple[1]*lumi)*(bkg_tuple[1]*lumi))
+    # end loop on bkg, the total error is the sqrt of the sum in quadrature  
     error_bkg = math.sqrt(error_bkg)
     
     significance=dict()
@@ -131,9 +132,9 @@ def run_optimization(outputdictionary,backgrounds,masses,bin_sel=""):
       significance[m] = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),reluncer)
       #print m,significance[m]
     
-    #print "nttbar", nttbar
+    #print "nindividual", nindividual
     #print "Significance ",significance
-    sel_sig_map [sel] = (significance, nsignal, totbkg, nttbar, error_ttbar, nttbar_raw, error_bkg)
+    sel_sig_map [sel] = (significance, nsignal, totbkg, nindividual, error_individual, nindividual_raw, error_bkg)
           
     #print "At selection #", i
           
@@ -175,7 +176,7 @@ if __name__ == "__main__":
 
     #bin_sel = bins_def[list_bins[index_bin]]
     #bin_sel = merge_sel(bin_sel,met_sel)
-  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_05_01/dict_17_05_01.pickle"
+  outputdictionary="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/optimization_EW/output_pickle_17_05_15/dict_17_05_15.pickle"
   
   sel_extra=""
   i = -1
