@@ -14,12 +14,12 @@ def add_weight(sel):
   # IFAE top framework
   #return "weight_mc*weight_lumi*weight_lep*weight_jvt*("+sel+")"
   # official inputs
-  #return "weight_mc*weight_lumi*weight_btag*weight_elec*weight_muon*weight_jvt*weight_WZ_2_2*("+sel+")"
-  return "weight_mc*weight_lumi*weight_WZ_2_2*("+sel+")"
+  return "weight_mc*weight_lumi*weight_btag*weight_elec*weight_muon*weight_jvt*weight_WZ_2_2*("+sel+")"
+  #return "weight_mc*weight_lumi*weight_WZ_2_2*("+sel+")"
 
 
-def add_trigger(sel):
-  return "pass_MET && ("+sel+")"
+#def add_trigger(sel):
+#  return "pass_MET && ("+sel+")"
 
 def merge_sel(sel1,sel2):
   return "("+sel1+") && ("+sel2+")"
@@ -73,7 +73,7 @@ def make_sel_list_from_cuts(all_cuts, sel_to_add=""):
     sel = sel[:-4]
     if len(sel_to_add)>0:
       sel=merge_sel(sel,sel_to_add)
-    sel=add_trigger(sel)
+    #sel=add_trigger(sel)
     sel=add_weight(sel)
     sel_list.append(sel)
   return sel_list

@@ -14,11 +14,11 @@ from read_tree import *
 lumi = 36074.56 # forseen for Moriond 2017
 reluncer = 0.3
 
-folder="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tag.EW.2.4.28-3-3/"
-sig_name=folder+"Sig_GGM_tagEW.2.4.28-3-3_nominal_all_types.root"
-bkg_name=folder+"bkg_tagEW.2.4.28-3-3_nominal.root"
-backgrounds=["Wjets","Zjets","SingleTop","ttbar"]
-masses = ["130","150","200","300","400","500","600","800"]
+folder="/nfs/pic.es/user/c/crizzi/scratch2/susy_EW/HF_inputs/tag.2.4.33-4-0/"
+sig_name=folder+"Sig_GGM_tag.2.4.33-4-0_nominal_hh4b.root"
+bkg_name=folder+"Bkg_tag.2.4.33-4-0_Vjets220_nominal_3b_0L_met.root"
+backgrounds=["Wjets","Zjets","SingleTop","ttbar","TopEW","diboson"]
+masses = ["200","300","400","500","600","800"]
 
 bkg_file = ROOT.TFile.Open(bkg_name,"READ")
 sig_file = ROOT.TFile.Open(sig_name,"READ")
@@ -26,12 +26,12 @@ sig_file = ROOT.TFile.Open(sig_name,"READ")
 def which_mass(name):
     for m in masses:
         if m in name:
-            if "hh" in name:
-                return "hh-"+m
-            elif "ZZ" in name:
-                return "ZZ-"+m
-            else:
-                return "Zh-"+m
+            #if "hh" in name:
+            return "hh-"+m
+            #elif "ZZ" in name:
+            #    return "ZZ-"+m
+            #else:
+            #    return "Zh-"+m
     if "sum" in name:
         return "quad sum"
     return "none"
@@ -45,12 +45,12 @@ if __name__ == "__main__":
     #--treeType 'hh' --sigType 'hh4b' --comb 1 --pdf 'significances_binned_ttbar50.pdf'
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--comb', default=1, type=int, help='If the regions are orthogonal, draw quadratic sum')
-    parser.add_argument('--reg', default='0', type=str, help='If this string is not in the reigon name, skip the region')
+    parser.add_argument('--comb', default=0, type=int, help='If the regions are orthogonal, draw quadratic sum')
+    parser.add_argument('--reg', default='hh', type=str, help='If this string is not in the reigon name, skip the region')
     parser.add_argument('--treeType', default='hh', type=str, help='read from hh or Zh sample? chosse hh or Zh')
     parser.add_argument('--sigType', default='hh4b', type=str, help='Which signal to look at?')
-    parser.add_argument('--json', default='../read_results/dict_test_binned_ttbar50_MaxUnctt40.json', type=str, help='Name of the pickle file with the region definition')
-    parser.add_argument('--pdf', default='significances_hhmass.pdf', type=str, help='Name of the output pdf file')
+    parser.add_argument('--json', default='discovery_regions.json', type=str, help='Name of the pickle file with the region definition')
+    parser.add_argument('--pdf', default='significances_discovery_regions.pdf', type=str, help='Name of the output pdf file')
     args = parser.parse_args()
 
     json_file=args.json
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     #h.GetXaxis().SetTitleSize(0.5)                                                                                                                                                                                
     for i in range(len(masses)):
         h.GetXaxis().SetBinLabel(i+1, masses[i])
-    h.SetMaximum(7)
+    h.SetMaximum(8)
     h.SetMinimum(0.1)
 
     hs=list()
@@ -118,7 +118,6 @@ if __name__ == "__main__":
         ibin = 1
         for m in masses:
             t_signal = sig_file.Get("GGM_"+tree_type+"_"+m+"_"+sig_type+"_NoSys")
-            print t_signal
             #t_signal = sig_file.Get("hh_"+m+"_hh4b_NoSys")
             if (not t_signal):
                 print "GGM_hh_"+m+"_NoSys"+" not found"
@@ -135,8 +134,8 @@ if __name__ == "__main__":
                 print "ZZ! x4"
                 nsignal[m]=nsignal[m]*4.0 # for Zh
             #if nsignal[m]/totbkg > 0.2:
-                #print m,nsignal[m], "S/B:",nsignal[m]/totbkg #,"sig:", RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
             signif = RooStats.NumberCountingUtils.BinomialExpZ(float(nsignal[m]),float(totbkg),0.3)
+            
             print m, "nsig:",nsignal[m], "  S/B:",round((nsignal[m]/totbkg)*100,1),"%","  sig:", signif
             hs[isel].SetBinContent(ibin, signif)
             ibin+=1
